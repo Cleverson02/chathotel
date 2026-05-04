@@ -1,0 +1,27 @@
+{
+  "name": "chat-hotel",
+  "version": "1.0.0",
+  "description": "Chat Hotel — O concierge de IA para hotelaria de alto padrão",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "preview": "open http://localhost:3000"
+  },
+  "keywords": [
+    "chathotel",
+    "concierge",
+    "ia",
+    "hotelaria",
+    "omnichannel"
+  ],
+  "author": "ELEVARE",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.0"
+  }
+}
