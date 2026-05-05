@@ -2,6 +2,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import sendProposalHandler from './api/send-proposal.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -20,7 +21,44 @@ const MIME_TYPES = {
   '.webp': 'image/webp',
 };
 
-const server = http.createServer((req, res) => {
+// Middleware para parsear JSON do body
+async function parseBody(req) {
+  return new Promise((resolve) => {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        req.body = body ? JSON.parse(body) : {};
+      } catch (e) {
+        req.body = {};
+      }
+      resolve();
+    });
+  });
+}
+
+const server = http.createServer(async (req, res) => {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
+  // API Routes
+  if (req.url === '/api/send-proposal') {
+    await parseBody(req);
+    return sendProposalHandler(req, res);
+  }
+
+  // Static file serving
   // Rota raiz
   if (req.url === '/' || req.url === '/Chat Hotel.html') {
     req.url = '/index.html';
