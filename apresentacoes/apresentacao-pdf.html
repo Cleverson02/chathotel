@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatHotel - Apresentação para Clientes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f4c75;
+            --primary-light: #3282b8;
+            --accent: #d4a574;
+            --accent-dark: #b8860b;
+            --text-dark: #1a1a2e;
+            --text-light: #555555;
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --border: #e0e0e0;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: white;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .page {
+            width: 21cm;
+            height: 29.7cm;
+            margin: 0 auto;
+            padding: 1.5cm;
+            background: white;
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            break-inside: avoid;
+        }
+
+        .page-cover {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2cm;
+        }
+
+        .robot-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 30px;
+        }
+
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: var(--accent);
+            margin: 20px auto;
+        }
+
+        .footer-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 20px;
+        }
+
+        .page-content {
+            padding: 0;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-number {
+            color: var(--primary-light);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .page-divider {
+            width: 50px;
+            height: 2.5px;
+            background: var(--accent);
+            margin: 15px 0 20px 0;
+        }
+
+        .intro-text {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 3px solid var(--accent);
+            background: var(--bg-light);
+        }
+
+        .cards-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            page-break-inside: avoid;
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 3px;
+            min-width: 100px;
+        }
+
+        .feature-list .icon {
+            font-size: 1.2rem;
+            min-width: 20px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .metric {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+
+        .metric-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-light);
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-dark);
+            letter-spacing: 0.3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-active {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .comparison-box {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .comparison-box h3 {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        .comparison-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .comparison-item::before {
+            content: '◯';
+            color: #ccc;
+            font-weight: bold;
+            min-width: 15px;
+        }
+
+        .comparison-box.after .comparison-item::before {
+            content: '✓';
+            color: var(--success);
+        }
+
+        .highlight {
+            background: #e0f2fe;
+            border-left: 3px solid var(--info);
+            padding: 12px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+
+        .timeline {
+            margin-top: 15px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 12px;
+            gap: 12px;
+            font-size: 0.85rem;
+        }
+
+        .timeline-marker {
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+
+        .timeline-content h4 {
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 3px;
+            font-weight: 700;
+        }
+
+        .timeline-content p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .page-footer {
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .logo-footer {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .page {
+                margin: 0;
+                page-break-after: always;
+                box-shadow: none;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- PÁGINA 1: CAPA -->
+    <div class="page page-cover">
+        <div class="robot-icon">🤖</div>
+        <span class="badge">Apresentação</span>
+        <h1>ChatHotel</h1>
+        <p class="subtitle">Agente de IA Concierge inteligente<br/>para sua rede hoteleira</p>
+        <div class="divider"></div>
+        <div class="footer-info">
+            <p>Keep Moving AI — Sua IA em Movimento</p>
+            <p>Maio 2026</p>
+        </div>
+    </div>
+
+    <!-- PÁGINA 2: SOBRE -->
+    <div class="page">
+        <div>
+            <div class="page-header">
+                <div class="page-number">01 — Conheça ChatHotel</div>
+                <h2>O Concierge Digital do Seu Hotel</h2>
+                <div class="page-divider"></div>
+            </div>
+
+            <div class="intro-text">
+                ChatHotel é o agente inteligente que atende seus hóspedes 24 horas por dia via WhatsApp,
+                responde perguntas sobre o hotel, agenda serviços, consulta disponibilidades e garante que
+                nenhuma mensagem fique sem resposta.
+            </div>
+
+            <div class="cards-row">
+                <div class="card">
+                    <span class="card-icon">💬</span>
+                    <h3>Atendimento 24/7</h3>
+                    <p>Responde a qualquer hora, em português, inglês e espanhol.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🤖</span>
+                    <h3>Inteligência de Ponta</h3>
+                    <p>Alimentada pela tecnologia mais avançada do mercado.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">👥</span>
+                    <h3>Sabe Quando Parar</h3>
+                    <p>Transfere para sua equipe automaticamente quando necessário.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span class="logo-footer">ChatHotel</span>
+            <span>Página 2</span>
+        </div>
+    </div>
+
+    <!-- PÁGINA 3: FUNCIONALIDADES -->
+    <div class="page">
+        <div>
+            <div class="page-header">
+                <div class="page-number">02 — Funcionalidades</div>
+                <h2>Tudo Que ChatHotel Faz</h2>
+                <div class="page-divider"></div>
+            </div>
+
+            <ul class="feature-list">
+                <li>
+                    <span class="icon">💬</span>
+                    <div>
+                        <strong>Atendimento WhatsApp</strong>
+                        Responde texto, áudio, imagens em português, inglês e espanhol.
+                    </div>
+                </li>
+                <li>
+                    <span class="icon">🏠</span>
+                    <div>
+                        <strong>Consulta de Quartos</strong>
+                        Busca disponibilidade com preços reais do sistema.
+                    </div>
+                </li>
+                <li>
+                    <span class="icon">💰</span>
+                    <div>
+                        <strong>Cotações Automáticas</strong>
+                        Gera cotações diretamente, facilitando conversão de reservas.
+                    </div>
+                </li>
+                <li>
+                    <span class="icon">📅</span>
+                    <div>
+                        <strong>Agendamento de Serviços</strong>
+                        Agenda SPA, restaurante, passeios verificando disponibilidade real.
+                    </div>
+                </li>
+                <li>
+                    <span class="icon">📚</span>
+                    <div>
+                        <strong>Respostas sobre o Hotel</strong>
+                        Base de conhecimento com dados reais do hotel.
+                    </div>
+                </li>
+                <li>
+                    <span class="icon">👥</span>
+                    <div>
+                        <strong>Transferência Inteligente</strong>
+                        9 gatilhos automáticos para atendimento humano quando necessário.
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="page-footer">
+            <span class="logo-footer">ChatHotel</span>
+            <span>Página 3</span>
+        </div>
+    </div>
+
+    <!-- PÁGINA 4: AUTOMAÇÕES -->
+    <div class="page">
+        <div>
+            <div class="page-header">
+                <div class="page-number">03 — Automações Proativas</div>
+                <h2>ChatHotel Antecipa Necessidades</h2>
+                <div class="page-divider"></div>
+            </div>
+
+            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 15px;">
+                Além de responder, ChatHotel age proativamente para melhorar a experiência do hóspede.
+            </p>
+
+            <div class="cards-row">
+                <div class="card">
+                    <span class="card-icon">📨</span>
+                    <h3>Pré-checkin</h3>
+                    <p><strong style="font-size: 0.75rem;">2 dias antes</strong></p>
+                    <p>Envia boas-vindas com horários, trajeto e dicas.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">⭐</span>
+                    <h3>NPS Pós-checkout</h3>
+                    <p><strong style="font-size: 0.75rem;">1 dia após saída</strong></p>
+                    <p>Coleta feedback automaticamente.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">💰</span>
+                    <h3>Follow-up Cotações</h3>
+                    <p><strong style="font-size: 0.75rem;">3, 5 e 7 dias</strong></p>
+                    <p>Recupera reservas sem parecer insistente.</p>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Automação Sem Supervisão:</strong> Essas automações funcionam sozinhas. ChatHotel identifica quem precisa receber cada mensagem e no momento certo.
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span class="logo-footer">ChatHotel</span>
+            <span>Página 4</span>
+        </div>
+    </div>
+
+    <!-- PÁGINA 5: SEGURANÇA -->
+    <div class="page">
+        <div>
+            <div class="page-header">
+                <div class="page-number">04 — Segurança</div>
+                <h2>Proteções Robustas</h2>
+                <div class="page-divider"></div>
+            </div>
+
+            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 15px;">
+                ChatHotel foi construído com múltiplas camadas de proteção para funcionamento seguro e confiável.
+            </p>
+
+            <div class="cards-row">
+                <div class="card">
+                    <span class="card-icon">🛡</span>
+                    <h3>Proteção Contra Abuso</h3>
+                    <p>27 padrões de detecção identificam tentativas de manipulação.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">⚡</span>
+                    <h3>Limite de Mensagens</h3>
+                    <p>Sistema limita automaticamente a 10 mensagens por minuto.</p>
+                </div>
+                <div class="card">
+                    <span class="card-icon">🔒</span>
+                    <h3>Resposta Garantida</h3>
+                    <p>Fallback automático garante que nenhuma mensagem fica sem resposta.</p>
+                </div>
+            </div>
+
+            <div class="highlight" style="margin-top: 15px;">
+                <strong>QA Result:</strong> 16 testes realizados, 94% aprovação, 0 falhas críticas. Nota 9,75/10.
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span class="logo-footer">ChatHotel</span>
+            <span>Página 5</span>
+        </div>
+    </div>
+
+    <!-- PÁGINA 6: NÚMEROS DE IMPACTO -->
+    <div class="page">
+        <div>
+            <div class="page-header">
+                <div class="page-number">05 — Números de Impacto</div>
+                <h2>O Que Muda Para Você</h2>
+                <div class="page-divider"></div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric">
+                    <div class="metric-number">24/7</div>
+                    <div class="metric-label">Disponibilidade</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-number">&lt;20s</div>
+                    <div class="metric-label">Resposta</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-number">3</div>
+                    <div class="metric-label">Idiomas</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-number">83</div>
+                    <div class="metric-label">Decisões Auto</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 18px; font-size: 1rem; color: var(--primary); margin-bottom: 10px;">Antes vs Depois</h3>
+
+            <div class="two-columns">
+                <div class="comparison-box">
+                    <h3 style="color: #999;">❌ Sem ChatHotel</h3>
+                    <div class="comparison-item">~10h/dia (comercial)</div>
+                    <div class="comparison-item">Resposta: minutos a horas</div>
+                    <div class="comparison-item">Apenas português</div>
+                    <div class="comparison-item">Cotações: não atendidas</div>
+                    <div class="comparison-item">SPA: por ligação</div>
+                    <div class="comparison-item">NPS: inexistente</div>
+                </div>
+
+                <div class="comparison-box after">
+                    <h3 style="color: var(--success);">✓ Com ChatHotel</h3>
+                    <div class="comparison-item">24/7 ininterrupto</div>
+                    <div class="comparison-item">Resposta: &lt;20 segundos</div>
+                    <div class="comparison-item">PT, EN, ES</div>
+                    <div class="comparison-item">Cotações: em tempo real</div>
+                    <div class="comparison-item">SPA: automático</div>
+                    <div class="comparison-item">NPS: automatizado</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span class="logo-footer">ChatHotel</span>
+            <span>Página 6</span>
+        </div>
+    </div>
+
+    <!-- PÁGINA 7: QUANDO RESOLVE E QUANDO CHAMA -->
+    <div class="page">
+        <div>
+            <div class="page-header">
+                <div class="page-number">06 — O Que Esperar</div>
+                <h2>Quando Resolve e Quando Chama Você</h2>
+                <div class="page-divider"></div>
+            </div>
+
+            <div class="two-columns">
+                <div>
+                    <h3 style="color: var(--success); margin-bottom: 12px; font-size: 0.95rem;">✓ Resolve Sozinho</h3>
+                    <ul class="feature-list" style="list-style: none;">
+                        <li style="border: none;"><span class="icon">🗨</span> Perguntas sobre hotel</li>
+                        <li style="border: none;"><span class="icon">📅</span> Agendamento</li>
+                        <li style="border: none;"><span class="icon">🏠</span> Consulta quartos</li>
+                        <li style="border: none;"><span class="icon">💰</span> Cotações</li>
+                        <li style="border: none;"><span class="icon">⭐</span> Pesquisa NPS</li>
+                        <li style="border: none;"><span class="icon">🌐</span> 3 idiomas</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: #d97706; margin-bottom: 12px; font-size: 0.95rem;">👥 Transfere Para Você</h3>
+                    <ul class="feature-list" style="list-style: none;">
+                        <li style="border: none;"><span class="icon">✋</span> Pede atendente</li>
+                        <li style="border: none;"><span class="icon">⚠️</span> Reclamação grave</li>
+                        <li style="border: none;"><span class="icon">💔</span> NPS baixo</li>
+                        <li style="border: none;"><span class="icon">💰</span> Negociação</li>
+                        <li style="border: none;"><span class="icon">🆘</span> Emergência</li>
+                        <li style="border: none;"><span class="icon">💳</span> Pagamento</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight" style="margin-top: 12px;">
+                <strong>Regra Simples:</strong> ChatHotel resolve o que pode e escala o que deve. Quando transfere, o atendente recebe o contexto completo.
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span class="logo-footer">ChatHotel</span>
+            <span>Página 7</span>
+        </div>
+    </div>
+
+    <!-- PÁGINA 8: PRÓXIMOS PASSOS -->
+    <div class="page">
+        <div>
+            <div class="page-header">
+                <div class="page-number">07 — Próximos Passos</div>
+                <h2>Evolução e Expansão</h2>
+                <div class="page-divider"></div>
+            </div>
+
+            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 15px;">
+                ChatHotel foi projetado para crescer. Cada nova funcionalidade se conecta à base existente sem reconstrução.
+            </p>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker">✓</div>
+                    <div class="timeline-content">
+                        <h4>Sprints 1-5: Fundação</h4>
+                        <p>Atendimento WhatsApp, base de conhecimento, serviços, Chatwoot</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker">✓</div>
+                    <div class="timeline-content">
+                        <h4>Sprint 6: Reservas e Cotações</h4>
+                        <p>Integração com seu sistema, consulta com preços reais</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker">→</div>
+                    <div class="timeline-content">
+                        <h4>Semanas 1-2: Monitoramento</h4>
+                        <p>Acompanhar conversas reais para calibrar respostas</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker">→</div>
+                    <div class="timeline-content">
+                        <h4>Semanas 2-3: Knowledge Base</h4>
+                        <p>Dados detalhados: Wi-Fi, café, cardápio, políticas</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker">→</div>
+                    <div class="timeline-content">
+                        <h4>Evolução: Dashboard e Pagamento</h4>
+                        <p>Métricas em tempo real e pagamento direto no WhatsApp</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span class="logo-footer">ChatHotel</span>
+            <span>Página 8</span>
+        </div>
+    </div>
+
+    <!-- PÁGINA 9: ENCERRAMENTO -->
+    <div class="page page-cover">
+        <div class="robot-icon">🤖</div>
+        <span class="badge">Obrigado</span>
+        <h1>ChatHotel Está Pronto</h1>
+        <p class="subtitle">
+            Sua rede hotelaria agora tem um concierge que nunca dorme,<br/>
+            nunca esquece uma mensagem, e conhece cada detalhe do seu hotel.
+        </p>
+
+        <p class="subtitle" style="opacity: 0.9; font-size: 0.95rem; font-weight: 400;">
+            Ele não substitui sua equipe — ele potencializa. Sua equipe faz o que humanos fazem melhor:
+            acolher, resolver problemas complexos, criar experiências memoráveis. ChatHotel cuida do resto.
+        </p>
+
+        <div class="divider"></div>
+
+        <div class="footer-info">
+            <p>Desenvolvido por Keep Moving AI</p>
+            <p>Maio 2026</p>
+        </div>
+    </div>
+</body>
+</html>
