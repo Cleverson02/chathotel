@@ -22,8 +22,8 @@ const MIME_TYPES = {
 
 const server = http.createServer((req, res) => {
   // Rota raiz
-  if (req.url === '/' || req.url === '/index.html') {
-    req.url = '/Chat Hotel.html';
+  if (req.url === '/' || req.url === '/Chat Hotel.html') {
+    req.url = '/index.html';
   }
 
   // Caminho do arquivo
