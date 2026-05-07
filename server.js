@@ -1,147 +1,85 @@
-import http from 'http';
-import fs from 'fs';
-import path from 'path';
+import express from 'express';
+import nodemailer from 'nodemailer';
+import cors from 'cors';
+import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
-import sendProposalHandler from './api/send-proposal.js';
+import { dirname } from 'path';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = process.env.PORT || 3000;
+dotenv.config();
 
-const MIME_TYPES = {
-  '.html': 'text/html; charset=utf-8',
-  '.css': 'text/css',
-  '.js': 'application/javascript',
-  '.jsx': 'application/javascript',
-  '.json': 'application/json',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.svg': 'image/svg+xml',
-  '.webp': 'image/webp',
-};
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// Middleware para parsear JSON do body
-async function parseBody(req) {
-  return new Promise((resolve) => {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      try {
-        req.body = body ? JSON.parse(body) : {};
-      } catch (e) {
-        req.body = {};
-      }
-      resolve();
-    });
-  });
-}
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.static('.'));
 
-const server = http.createServer(async (req, res) => {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200);
-    res.end();
-    return;
+// Configuração de email
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER || 'seu-email@gmail.com',
+    pass: process.env.EMAIL_PASS || 'sua-senha-app'
   }
-
-  // API Routes
-  if (req.url === '/api/send-proposal') {
-    await parseBody(req);
-    return sendProposalHandler(req, res);
-  }
-
-  // Static file serving
-  // Rota raiz
-  if (req.url === '/' || req.url === '/Chat Hotel.html') {
-    req.url = '/index.html';
-  }
-
-  // Caminho do arquivo
-  let filePath = path.join(__dirname, req.url);
-
-  // Sanitizar path
-  if (!filePath.startsWith(__dirname)) {
-    res.writeHead(403, { 'Content-Type': 'text/plain' });
-    res.end('Forbidden');
-    return;
-  }
-
-  // Se for um diretório, servir index.html
-  if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
-    filePath = path.join(filePath, 'index.html');
-  }
-
-  // Adicionar extensão .html se não houver extensão
-  if (!path.extname(filePath)) {
-    filePath += '.html';
-  }
-
-  // Ler arquivo
-  fs.readFile(filePath, (err, data) => {
-    if (err) {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('404 - Arquivo não encontrado\n' + req.url);
-      return;
-    }
-
-    // Detectar mime type
-    const ext = path.extname(filePath).toLowerCase();
-    const mimeType = MIME_TYPES[ext] || 'application/octet-stream';
-
-    // Adicionar headers de cache
-    const isStatic = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'].includes(ext);
-
-    res.writeHead(200, {
-      'Content-Type': mimeType,
-      'Cache-Control': isStatic ? 'public, max-age=86400' : 'no-cache',
-      'Access-Control-Allow-Origin': '*',
-    });
-    res.end(data);
-  });
 });
 
-server.listen(PORT, () => {
-  console.log(`
-╔════════════════════════════════════════════════════════════╗
-║                 Chat Hotel Development Server              ║
-╚════════════════════════════════════════════════════════════╝
+// Endpoint para receber submissões do formulário
+app.post('/api/send-proposal', async (req, res) => {
+  try {
+    const { name, email, phone, hotel, message } = req.body;
 
-🎯 Servidor rodando em http://localhost:${PORT}
-📱 Versão do projeto: 1.0.0
+    // Validação básica
+    if (!name || !email || !phone || !hotel) {
+      return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
 
-Componentes carregados:
-  ✓ Hero Section
-  ✓ Omnichannel
-  ✓ Features & Upsell
-  ✓ Platform Preview
-  ✓ ROI Calculator
-  ✓ Launch Offer
-  ✓ CTA & Footer
-  ✓ Design Tweaks Panel
+    // Enviar email para o administrador
+    const adminMailOptions = {
+      from: process.env.EMAIL_USER || 'seu-email@gmail.com',
+      to: 'giu.debona@gmail.com',
+      subject: `Novo Lead - Chat Hotel: ${hotel}`,
+      html: `
+        <h2>Nova Submissão do Formulário</h2>
+        <p><strong>Nome:</strong> ${name}</p>
+        <p><strong>Hotel:</strong> ${hotel}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>WhatsApp:</strong> ${phone}</p>
+        <p><strong>Mensagem:</strong></p>
+        <p>${message.replace(/\n/g, '<br>')}</p>
+        <hr>
+        <p style="font-size: 12px; color: #999;">Enviado em ${new Date().toLocaleString('pt-BR')}</p>
+      `
+    };
 
-Tipografia:
-  Display: Fraunces, Cormorant Garamond, Instrument Serif
-  Body: Inter
-  Mono: Chakra Petch, JetBrains Mono
+    // Enviar confirmação para o cliente
+    const clientMailOptions = {
+      from: process.env.EMAIL_USER || 'seu-email@gmail.com',
+      to: email,
+      subject: 'Recebemos sua solicitação - Chat Hotel 🎉',
+      html: `
+        <h2>Obrigado pelo seu interesse!</h2>
+        <p>Olá ${name},</p>
+        <p>Recebemos sua solicitação de demonstração do Chat Hotel para <strong>${hotel}</strong>.</p>
+        <p>Nosso time entrará em contato em até 1 hora útil pelo WhatsApp <strong>${phone}</strong> ou por email para agendar sua demonstração.</p>
+        <hr>
+        <p style="font-size: 12px; color: #999;">Se tiver dúvidas, entre em contato: chathotel@elevare.tur.br</p>
+      `
+    };
 
-Paletas (5 variações):
-  • Midnight Gold (padrão)
-  • Obsidian Copper
-  • Emerald Sand
-  • Bordeaux Cream
-  • Electric ELEVARE
+    // Enviar ambos os emails
+    await transporter.sendMail(adminMailOptions);
+    await transporter.sendMail(clientMailOptions);
 
-Modo escuro: Ativado
-Modo light: Disponível via tweaks panel
+    res.json({ success: true, message: 'Formulário recebido com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao enviar email:', error);
+    res.status(500).json({ error: 'Erro ao processar sua solicitação' });
+  }
+});
 
-Pressione Ctrl+C para parar o servidor.
-  `);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
+  console.log(`📧 Emails serão enviados para: giu.debona@gmail.com`);
 });

@@ -205,11 +205,19 @@ const CTASection = () => {
         type: 'proposal',
       };
 
-      const response = await fetch('/api/send-proposal', {
+      const apiUrl = window.location.hostname === 'localhost'
+        ? 'http://localhost:3000/api/send-proposal'
+        : `${window.location.origin}/api/send-proposal`;
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
 
       const result = await response.json();
 
