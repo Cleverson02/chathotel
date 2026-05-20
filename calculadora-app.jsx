@@ -55,18 +55,24 @@ OBSERVAÇÕES:
 ${formData.message}
     `.trim();
 
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      hotel: formData.hotel,
+      message: message,
+      type: 'roi-calculator'
+    };
+
     try {
-      const response = await fetch('/api/send-proposal', {
+      // Tentar enviar via API
+      const apiUrl = `${window.location.origin}/api/send-proposal`;
+      console.log('Enviando para:', apiUrl);
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          hotel: formData.hotel,
-          message: message,
-          type: 'roi-calculator'
-        })
+        body: JSON.stringify(payload)
       });
 
       if (response.ok) {
@@ -76,9 +82,14 @@ ${formData.message}
           setFormData({ name: '', email: '', phone: '', hotel: '', message: '' });
           setSubmitted(false);
         }, 3000);
+      } else {
+        throw new Error(`API error: ${response.status}`);
       }
     } catch (error) {
       console.error('Erro ao enviar:', error);
+      // Fallback: Abrir mailto com os dados
+      const mailtoBody = encodeURIComponent(`Formulário da Calculadora ROI\n\n${message}`);
+      window.location.href = `mailto:cleverson.s.silva@gmail.com?subject=Interessado em Chat Hotel&body=${mailtoBody}`;
     }
     setLoading(false);
   };
@@ -135,8 +146,8 @@ ${formData.message}
         .btn-whatsapp { background: #25D366; color: white; }
         .btn-whatsapp:hover { background: #20BA5A; }
 
-        .form-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .form-modal { background: var(--bg); border: 1px solid var(--line); border-radius: 20px; padding: 40px; max-width: 500px; width: 100%; }
+        .form-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; overflow-y: auto; }
+        .form-modal { background: var(--bg); border: 1px solid var(--line); border-radius: 20px; padding: 40px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto; }
         .form-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--fg); font-size: 24px; cursor: pointer; }
         .form-title { font-size: 24px; font-family: var(--font-display); margin-bottom: 20px; }
         .form-group { margin-bottom: 20px; }
