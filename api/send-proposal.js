@@ -1,30 +1,16 @@
-// Serverless function to send proposal emails via Sendgrid
-// Deploy to Vercel with SENDGRID_API_KEY environment variable
-
 import nodemailer from 'nodemailer';
 
-const RECIPIENT_EMAIL = 'cleverson.s.silva@gmail.com';
-const SENDER_EMAIL = process.env.SENDER_EMAIL || 'noreply@chathotel.elevare.tur.br';
+const RECIPIENT_EMAIL = 'giu.debona@gmail.com';
+const SENDER_EMAIL = process.env.EMAIL_USER || 'noreply@chathotel.elevare.tur.br';
 
-// Transport configuration — using SendGrid SMTP relay
+// Gmail SMTP configuration
 const transporter = nodemailer.createTransport({
-  host: 'smtp.sendgrid.net',
-  port: 587,
-  secure: false,
+  service: 'gmail',
   auth: {
-    user: 'apikey',
-    pass: process.env.SENDGRID_API_KEY || '',
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
-
-// Alternative: Gmail configuration (if using Gmail SMTP)
-// const transporter = nodemailer.createTransport({
-//   service: 'gmail',
-//   auth: {
-//     user: process.env.GMAIL_USER,
-//     pass: process.env.GMAIL_PASSWORD,
-//   },
-// });
 
 export default async function handler(req, res) {
   // Enable CORS

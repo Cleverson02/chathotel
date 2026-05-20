@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Chat Hotel — O concierge de IA para hotelaria de alto padrão</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&family=Chakra+Petch:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+<link rel="stylesheet" href="styles.css"/>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="tokens.jsx"></script>
+<script type="text/babel" src="brand.jsx"></script>
+<script type="text/babel" src="conversation.jsx"></script>
+<script type="text/babel" src="hero.jsx"></script>
+<script type="text/babel" src="omnichannel.jsx"></script>
+<script type="text/babel" src="features-upsell.jsx"></script>
+<script type="text/babel" src="platform.jsx"></script>
+<script type="text/babel" src="offer-cta-footer.jsx"></script>
+</head>
+<body class="grain">
+<div id="root"></div>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "palette": "midnight",
+  "typePair": "editorial",
+  "darkMode": true
+}/*EDITMODE-END*/;
+
+function applyTokens(paletteKey, typeKey, dark) {
+  const palette = (dark ? PALETTES : PALETTES_LIGHT)[paletteKey];
+  const type = TYPE_PAIRS[typeKey];
+  const r = document.documentElement.style;
+  Object.entries({
+    '--bg': palette.bg, '--bg-elev': palette.bgElev, '--surface': palette.surface,
+    '--line': palette.line, '--fg': palette.fg, '--fg-muted': palette.fgMuted,
+    '--fg-subtle': palette.fgSubtle, '--brand': palette.brand, '--brand-soft': palette.brandSoft,
+    '--accent': palette.accent, '--accent-soft': palette.accentSoft, '--glow': palette.glow,
+    '--font-display': type.display, '--font-body': type.body, '--font-mono': type.mono,
+  }).forEach(([k, v]) => r.setProperty(k, v));
+}
+
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const palette = (tweaks.darkMode ? PALETTES : PALETTES_LIGHT)[tweaks.palette];
+  const typePair = TYPE_PAIRS[tweaks.typePair];
+
+  React.useEffect(() => {
+    applyTokens(tweaks.palette, tweaks.typePair, tweaks.darkMode);
+  }, [tweaks.palette, tweaks.typePair, tweaks.darkMode]);
+
+  React.useEffect(() => {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <>
+      <Hero palette={palette}/>
+      <OmnichannelSection palette={palette}/>
+      <FeaturesSection/>
+      <UpsellSection/>
+      <PlatformSection/>
+      <ROICalculator/>
+      <LaunchOffer/>
+      <CTASection/>
+      <Footer/>
+
+      <TweaksPanel title="Tweaks · Chat Hotel">
+        <TweakSection title="Paleta">
+          <TweakSelect
+            value={tweaks.palette}
+            onChange={v => setTweak('palette', v)}
+            options={[
+              { value: 'midnight', label: 'Midnight Gold (azul + dourado)' },
+              { value: 'obsidian', label: 'Obsidian Copper (preto + cobre)' },
+              { value: 'emerald', label: 'Emerald Sand (verde + areia)' },
+              { value: 'bordeaux', label: 'Bordeaux Cream (vinho + dourado)' },
+              { value: 'electric', label: 'Electric ELEVARE (preto + neon)' },
+            ]}
+          />
+        </TweakSection>
+        <TweakSection title="Tipografia">
+          <TweakRadio
+            value={tweaks.typePair}
+            onChange={v => setTweak('typePair', v)}
+            options={[
+              { value: 'editorial', label: 'Editorial' },
+              { value: 'techLuxury', label: 'Tech Luxury' },
+              { value: 'modernTech', label: 'Modern' },
+            ]}
+          />
+          <div style={{ fontSize: 11, color: 'var(--fg-muted)', marginTop: 8, fontFamily: 'var(--font-mono)' }}>
+            {typePair.description}
+          </div>
+        </TweakSection>
+        <TweakSection title="Modo">
+          <TweakToggle label="Modo escuro" value={tweaks.darkMode} onChange={v => setTweak('darkMode', v)}/>
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
