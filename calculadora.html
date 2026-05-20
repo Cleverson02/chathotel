@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&family=Chakra+Petch:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-
   <link rel="stylesheet" href="styles.css"/>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23D4B36A'>💎</text></svg>"/>
 
@@ -16,118 +15,212 @@
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-  <!-- Design system tokens -->
   <script type="text/babel" src="tokens.jsx"></script>
-  <!-- Calculadora app -->
-  <script type="text/babel" src="calculadora-app.jsx"></script>
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.6;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    /* Header/Nav */
-    nav {
-      background: var(--bg);
-      border-bottom: 1px solid var(--line);
-      padding: 16px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--brand);
-      text-decoration: none;
-      font-family: var(--font-display);
-    }
-
-    .logo:hover {
-      opacity: 0.8;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 24px;
-      align-items: center;
-    }
-
-    .nav-link {
-      color: var(--fg-muted);
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 200ms;
-    }
-
-    .nav-link:hover {
-      color: var(--brand);
-    }
-
-    .nav-btn {
-      padding: 10px 18px;
-      background: var(--brand);
-      color: var(--bg);
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      transition: background 200ms;
-    }
-
-    .nav-btn:hover {
-      background: var(--accent);
-    }
-  </style>
 </head>
 <body class="grain">
 
-<nav>
-  <div class="nav-container">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-body, -apple-system, sans-serif); background: var(--bg); color: var(--fg); }
+
+  .navbar { background: var(--bg); border-bottom: 1px solid var(--line); padding: 16px 20px; }
+  .navbar-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-size: 18px; font-weight: 600; color: var(--brand); text-decoration: none; font-family: var(--font-display); }
+  .logo:hover { opacity: 0.8; }
+  .nav-link { color: var(--fg-muted); text-decoration: none; font-size: 14px; transition: color 200ms; }
+  .nav-link:hover { color: var(--brand); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
+  .header { text-align: center; margin-bottom: 60px; }
+  .eyebrow { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.14em; color: var(--fg-muted); text-transform: uppercase; }
+  .title { font-size: clamp(40px, 5vw, 64px); font-family: var(--font-display); font-style: italic; color: var(--fg); margin: 20px 0; line-height: 1.2; }
+  .subtitle { font-size: 18px; color: var(--fg-muted); max-width: 600px; margin: 0 auto; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; align-items: stretch; }
+  @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 40px; }
+  .card.highlight { background: linear-gradient(135deg, var(--surface), var(--bg-elev)); border-color: var(--brand); position: relative; overflow: hidden; }
+  .card.highlight::before { content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: radial-gradient(circle at 100% 0%, var(--glow), transparent 70%); }
+  .card > * { position: relative; }
+
+  .label { font-size: 11px; font-family: var(--font-mono); color: var(--fg-muted); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 24px; display: block; }
+  .card.highlight .label { color: var(--brand); }
+
+  .slider-group { margin-bottom: 24px; }
+  .slider-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
+  .slider-label { color: var(--fg-muted); }
+  .slider-value { font-family: var(--font-display); font-style: italic; color: var(--brand); font-variant-numeric: tabular-nums; font-size: 16px; }
+  input[type="range"] { width: 100%; height: 4px; border-radius: 4px; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; }
+  input[type="range"]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; background: var(--brand); border: 2px solid var(--bg); border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 1px var(--brand), 0 4px 12px var(--glow); }
+  input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; background: var(--brand); border: 2px solid var(--bg); border-radius: 50%; cursor: pointer; }
+
+  .note { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12px; color: var(--fg-muted); font-family: var(--font-mono); line-height: 1.7; }
+  .note div { margin-bottom: 6px; }
+
+  .result { margin-bottom: 28px; }
+  .result-label { font-size: 12px; color: var(--fg-muted); font-family: var(--font-mono); letter-spacing: 0.06em; margin-bottom: 8px; }
+  .result-value { font-family: var(--font-display); font-style: italic; color: var(--brand); font-variant-numeric: tabular-nums; line-height: 1; }
+  .result-value.large { font-size: clamp(40px, 5vw, 64px); }
+  .result-value.small { font-size: clamp(32px, 4vw, 48px); color: var(--fg); }
+
+  .row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: none; }
+  .row-label { color: var(--fg-muted); }
+  .row-value { color: var(--fg); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  .actions { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+  .btn { padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 200ms; font-family: inherit; }
+  .btn-primary { background: var(--brand); color: var(--bg); }
+  .btn-primary:hover { background: var(--accent); box-shadow: 0 8px 24px var(--glow); }
+  .btn-whatsapp { background: #25D366; color: white; }
+  .btn-whatsapp:hover { background: #20BA5A; }
+  .btn-email { background: var(--accent); color: white; }
+  .btn-email:hover { background: var(--brand); }
+
+  .disclaimer { font-size: 11px; color: var(--fg-subtle); text-align: center; margin-top: 32px; font-family: var(--font-mono); letter-spacing: 0.04em; }
+</style>
+
+<div class="navbar">
+  <div class="navbar-content">
     <a href="/" class="logo">💎 Chat Hotel</a>
-    <div class="nav-links">
-      <a href="/" class="nav-link">Voltar para LP</a>
-      <a href="https://wa.me/5511987654321" class="nav-btn">WhatsApp</a>
+    <a href="/" class="nav-link">← Voltar para LP</a>
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <span class="eyebrow">Calculadora de Retorno</span>
+    <h1 class="title">Quanto o Chat Hotel<br><em>devolve</em> ao seu hotel</h1>
+    <p class="subtitle">Estimativa baseada em ganho de conversão 24/7 + upsell autônomo. Ajuste os parâmetros do seu hotel e veja o impacto.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <span class="label">Seu Hotel</span>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-label">Quartos</span>
+          <span class="slider-value" id="roomsValue">80</span>
+        </div>
+        <input type="range" id="rooms" min="10" max="300" step="5" value="80" onchange="updateCalculator()"/>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-label">Diária Média (ADR)</span>
+          <span class="slider-value" id="adrValue">R$ 680</span>
+        </div>
+        <input type="range" id="adr" min="200" max="3000" step="20" value="680" onchange="updateCalculator()"/>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-label">Taxa de Conversão Atual</span>
+          <span class="slider-value" id="conversionValue">15%</span>
+        </div>
+        <input type="range" id="conversion" min="1" max="40" step="1" value="15" onchange="updateCalculator()"/>
+      </div>
+
+      <div class="note">
+        <div>CONTATOS ESTIMADOS / MÊS · <span id="monthlyContacts">1440</span></div>
+        <div>GANHO DE CONVERSÃO APLICADO · +32%</div>
+        <div>UPSELL MÉDIO · R$ 180 / RESERVA</div>
+      </div>
+    </div>
+
+    <div class="card highlight">
+      <span class="label">Receita Incremental Estimada</span>
+
+      <div class="result">
+        <div class="result-label">POR MÊS</div>
+        <div class="result-value large" id="monthlyResult">R$ 0</div>
+      </div>
+
+      <div class="result">
+        <div class="result-label">POR ANO</div>
+        <div class="result-value small" id="yearlyResult">R$ 0</div>
+      </div>
+
+      <div style="padding-top: 24px; border-top: 1px solid var(--line);">
+        <div class="row">
+          <span class="row-label">Reservas a mais / mês</span>
+          <span class="row-value" id="reservasExtra">0</span>
+        </div>
+        <div class="row">
+          <span class="row-label">Receita por reservas extras</span>
+          <span class="row-value" id="revenueExtra">R$ 0</span>
+        </div>
+        <div class="row">
+          <span class="row-label">Receita de upsells</span>
+          <span class="row-value" id="upsellRevenue">R$ 0</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a id="whatsappBtn" class="btn btn-whatsapp" href="#" target="_blank">Chamar no WhatsApp 💬</a>
+        <a id="emailBtn" class="btn btn-email" href="mailto:cleverson.s.silva@gmail.com">Enviar por Email 📧</a>
+      </div>
     </div>
   </div>
-</nav>
 
-<div id="root"></div>
+  <div class="disclaimer">
+    · Estimativas conservadoras baseadas em médias de mercado. Cada hotel é um caso único.
+  </div>
+</div>
 
-<script type="text/babel">
-  const TWEAK_DEFAULTS = {
-    "palette": "midnight",
-    "typePair": "editorial",
-    "darkMode": true
-  };
+<script>
+  function fmt(n) {
+    return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+  }
 
-  function applyTokens(paletteKey, typeKey, dark) {
-    const palette = (dark ? PALETTES : PALETTES_LIGHT)[paletteKey];
-    const type = TYPE_PAIRS[typeKey];
+  function updateCalculator() {
+    const rooms = parseInt(document.getElementById('rooms').value);
+    const adr = parseInt(document.getElementById('adr').value);
+    const conversion = parseInt(document.getElementById('conversion').value);
+
+    // Update display values
+    document.getElementById('roomsValue').textContent = rooms;
+    document.getElementById('adrValue').textContent = fmt(adr);
+    document.getElementById('conversionValue').textContent = conversion + '%';
+
+    // Calculation
+    const monthlyContacts = rooms * 18;
+    const liftPct = 0.32;
+    const additionalReservations = Math.round(monthlyContacts * (conversion / 100) * liftPct);
+    const additionalRevenue = additionalReservations * adr * 1.8;
+    const upsellRevenue = Math.round(additionalReservations * 180);
+    const totalMonthly = additionalRevenue + upsellRevenue;
+    const yearly = totalMonthly * 12;
+
+    // Update results
+    document.getElementById('monthlyContacts').textContent = monthlyContacts.toLocaleString('pt-BR');
+    document.getElementById('monthlyResult').textContent = fmt(totalMonthly);
+    document.getElementById('yearlyResult').textContent = fmt(yearly);
+    document.getElementById('reservasExtra').textContent = '+' + additionalReservations;
+    document.getElementById('revenueExtra').textContent = fmt(additionalRevenue);
+    document.getElementById('upsellRevenue').textContent = fmt(upsellRevenue);
+
+    // Update WhatsApp link
+    const message = `Olá! Utilizei a calculadora de retorno do Chat Hotel e calculei um retorno potencial de *R$ ${Math.round(yearly).toLocaleString('pt-BR')}* por ano (com ${conversion}% de conversão atual, ${rooms} quartos e diária média de R$ ${adr}). Gostaria de saber mais sobre como implementar o Chat Hotel no meu hotel!`;
+    document.getElementById('whatsappBtn').href = `https://wa.me/5541992756768?text=${encodeURIComponent(message)}`;
+
+    // Update email link
+    const emailBody = `Calculadora de ROI - Chat Hotel\n\nParâmetros:\nQuartos: ${rooms}\nDiária Média: R$ ${adr}\nTaxa de Conversão: ${conversion}%\n\nResultados:\nContatos/mês: ${monthlyContacts}\nReservas a mais/mês: +${additionalReservations}\nReceita incremental/mês: ${fmt(totalMonthly)}\nReceita incremental/ano: ${fmt(yearly)}\n\nGostaria de saber mais sobre o Chat Hotel para meu hotel!`;
+    document.getElementById('emailBtn').href = `mailto:cleverson.s.silva@gmail.com?subject=Interessado em Chat Hotel - Calculadora de ROI&body=${encodeURIComponent(emailBody)}`;
+  }
+
+  // Initialize on load
+  window.addEventListener('DOMContentLoaded', updateCalculator);
+</script>
+
+<script type="text/babel" src="tokens.jsx"></script>
+<script>
+  // Apply design tokens
+  if (typeof PALETTES !== 'undefined') {
+    const palette = PALETTES.midnight;
+    const type = TYPE_PAIRS.editorial;
     const r = document.documentElement.style;
     Object.entries({
       '--bg': palette.bg, '--bg-elev': palette.bgElev, '--surface': palette.surface,
@@ -137,10 +230,6 @@
       '--font-display': type.display, '--font-body': type.body, '--font-mono': type.mono,
     }).forEach(([k, v]) => r.setProperty(k, v));
   }
-
-  applyTokens(TWEAK_DEFAULTS.palette, TWEAK_DEFAULTS.typePair, TWEAK_DEFAULTS.darkMode);
-
-  ReactDOM.createRoot(document.getElementById('root')).render(<CalculadoraApp/>);
 </script>
 
 </body>
