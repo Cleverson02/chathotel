@@ -173,7 +173,7 @@
 
       <div class="actions">
         <a id="whatsappBtn" class="btn btn-whatsapp" href="#" target="_blank">Chamar no WhatsApp 💬</a>
-        <a id="emailBtn" class="btn btn-email" href="mailto:cleverson.s.silva@gmail.com">Enviar por Email 📧</a>
+        <button id="emailBtn" class="btn btn-email" onclick="sendEmail()">Enviar por Email 📧</button>
       </div>
     </div>
   </div>
@@ -186,6 +186,75 @@
 <script>
   function fmt(n) {
     return 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+  }
+
+  function sendEmail() {
+    const rooms = parseInt(document.getElementById('rooms').value);
+    const adr = parseInt(document.getElementById('adr').value);
+    const conversion = parseInt(document.getElementById('conversion').value);
+    const monthlyContacts = rooms * 18;
+    const additionalReservations = Math.round(monthlyContacts * (conversion / 100) * 0.32);
+    const additionalRevenue = additionalReservations * adr * 1.8;
+    const upsellRevenue = Math.round(additionalReservations * 180);
+    const totalMonthly = additionalRevenue + upsellRevenue;
+    const yearly = totalMonthly * 12;
+
+    // Criar um formulário e submeter via POST
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/api/send-proposal';
+
+    const data = {
+      name: 'Interessado em Chat Hotel',
+      email: 'cliente@hotel.com',
+      hotel: 'Seu Hotel',
+      phone: '',
+      message: `Utilizei a calculadora de retorno e obtive os seguintes resultados:
+
+Parâmetros:
+- Quartos: ${rooms}
+- Diária Média (ADR): R$ ${adr.toLocaleString('pt-BR')}
+- Taxa de Conversão Atual: ${conversion}%
+
+Resultados Estimados:
+- Contatos/mês: ${monthlyContacts.toLocaleString('pt-BR')}
+- Reservas a mais/mês: +${additionalReservations}
+- Receita incremental/mês: ${fmt(totalMonthly)}
+- Receita incremental/ano: ${fmt(yearly)}
+
+Gostaria de saber mais sobre como implementar o Chat Hotel no meu hotel e receber uma demonstração.`,
+      type: 'roi-calculator'
+    };
+
+    // Tentar enviar via API primeiro
+    fetch('/api/send-proposal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(r => r.ok ? Promise.resolve() : Promise.reject())
+    .catch(() => {
+      // Se API falhar, usar mailto como fallback
+      const subject = 'Interessado em Chat Hotel - Calculadora de ROI';
+      const body = `Olá,
+
+Utilizei a calculadora de retorno do Chat Hotel e calculei um retorno potencial de ${fmt(yearly)} por ano.
+
+Parâmetros utilizados:
+- Quartos: ${rooms}
+- Diária Média: R$ ${adr.toLocaleString('pt-BR')}
+- Taxa de Conversão: ${conversion}%
+
+Resultados:
+- Contatos/mês: ${monthlyContacts.toLocaleString('pt-BR')}
+- Reservas extras/mês: +${additionalReservations}
+- Receita/mês: ${fmt(totalMonthly)}
+- Receita/ano: ${fmt(yearly)}
+
+Gostaria de saber mais!`;
+
+      window.location.href = `mailto:cleverson.s.silva@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
   }
 
   function updateCalculator() {
@@ -218,10 +287,6 @@
     // Update WhatsApp link
     const message = `Olá! Utilizei a calculadora de retorno do Chat Hotel e calculei um retorno potencial de *R$ ${Math.round(yearly).toLocaleString('pt-BR')}* por ano (com ${conversion}% de conversão atual, ${rooms} quartos e diária média de R$ ${adr}). Gostaria de saber mais sobre como implementar o Chat Hotel no meu hotel!`;
     document.getElementById('whatsappBtn').href = `https://wa.me/5541992756768?text=${encodeURIComponent(message)}`;
-
-    // Update email link
-    const emailBody = `Calculadora de ROI - Chat Hotel\n\nParâmetros:\nQuartos: ${rooms}\nDiária Média: R$ ${adr}\nTaxa de Conversão: ${conversion}%\n\nResultados:\nContatos/mês: ${monthlyContacts}\nReservas a mais/mês: +${additionalReservations}\nReceita incremental/mês: ${fmt(totalMonthly)}\nReceita incremental/ano: ${fmt(yearly)}\n\nGostaria de saber mais sobre o Chat Hotel para meu hotel!`;
-    document.getElementById('emailBtn').href = `mailto:cleverson.s.silva@gmail.com?subject=Interessado em Chat Hotel - Calculadora de ROI&body=${encodeURIComponent(emailBody)}`;
   }
 
   // Initialize on load
