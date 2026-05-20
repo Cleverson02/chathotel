@@ -244,7 +244,7 @@ ${formData.message}
               <button className="btn btn-primary" onClick={() => setShowForm(true)}>
                 Quero saber mais 📧
               </button>
-              <a className="btn btn-whatsapp" href="https://wa.me/5511987654321?text=Olá! Tenho interesse em saber mais sobre o Chat Hotel. Calculei um retorno potencial de R$ {Math.round(yearly).toLocaleString('pt-BR')} por ano." target="_blank">
+              <a className="btn btn-whatsapp" href={`https://wa.me/5541992756768?text=Olá! Tenho interesse em saber mais sobre o Chat Hotel. Calculei um retorno potencial de R$ ${Math.round(yearly).toLocaleString('pt-BR')} por ano.`} target="_blank">
                 Chamar no WhatsApp 💬
               </a>
             </div>
