@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('.'));
 
-// Configuração de email
+// Configuração de email via Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -24,62 +24,188 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Helper para escapar HTML
+function escapeHtml(text) {
+  if (!text) return '';
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
 // Endpoint para receber submissões do formulário
 app.post('/api/send-proposal', async (req, res) => {
   try {
     const { name, email, phone, hotel, message } = req.body;
 
     // Validação básica
-    if (!name || !email || !phone || !hotel) {
-      return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    if (!name || !email || !hotel) {
+      return res.status(400).json({
+        success: false,
+        error: 'Campos obrigatórios faltando: name, email, hotel'
+      });
     }
 
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email inválido'
+      });
+    }
+
+    const RECIPIENT_EMAIL = process.env.EMAIL_TO || 'giu.debona@gmail.com';
+    const SENDER_EMAIL = process.env.EMAIL_USER || 'seu-email@gmail.com';
+
+    // Template HTML para email do admin
+    const adminHtmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Nova Proposta - Chat Hotel</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #0A1726; color: #F4EFE2; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+            .content { background: #f5f5f5; padding: 20px; border-radius: 0 0 8px 8px; }
+            .field { margin-bottom: 16px; }
+            .label { font-weight: 600; color: #0A1726; margin-bottom: 4px; }
+            .value { color: #555; padding: 8px; background: white; border-left: 3px solid #D4B36A; padding-left: 12px; }
+            .footer { margin-top: 20px; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0; font-size: 24px;">🎯 Nova Proposta</h1>
+              <p style="margin: 8px 0 0; opacity: 0.9;">Chat Hotel - Concierge IA para Hotelaria</p>
+            </div>
+            <div class="content">
+              <div class="field">
+                <div class="label">📧 Email</div>
+                <div class="value">${escapeHtml(email)}</div>
+              </div>
+              <div class="field">
+                <div class="label">👤 Nome</div>
+                <div class="value">${escapeHtml(name)}</div>
+              </div>
+              ${hotel ? `
+              <div class="field">
+                <div class="label">🏨 Hotel</div>
+                <div class="value">${escapeHtml(hotel)}</div>
+              </div>
+              ` : ''}
+              ${phone ? `
+              <div class="field">
+                <div class="label">📱 WhatsApp</div>
+                <div class="value">${escapeHtml(phone)}</div>
+              </div>
+              ` : ''}
+              <div class="field">
+                <div class="label">💬 Mensagem</div>
+                <div class="value" style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(message)}</div>
+              </div>
+              <div class="footer">
+                <p>Recebida em ${new Date().toLocaleString('pt-BR')}</p>
+                <p>Responder para: ${escapeHtml(email)}</p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Template HTML para confirmação ao cliente
+    const clientHtmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #D4B36A; color: #0A1726; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px; }
+            .content { line-height: 1.6; color: #555; }
+            .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #999; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="margin: 0; color: #0A1726;">✅ Recebemos sua mensagem!</h1>
+            </div>
+            <div class="content">
+              <p>Olá <strong>${escapeHtml(name)}</strong>,</p>
+              <p>Obrigado por seu interesse no Chat Hotel! 🙏</p>
+              <p>Recebemos sua proposta com sucesso e nossa equipe será notificada imediatamente. Você receberá um retorno em breve pelo WhatsApp ou email.</p>
+              <p><strong>Detalhes da sua solicitação:</strong></p>
+              <ul>
+                <li>Email: ${escapeHtml(email)}</li>
+                <li>Hotel: ${escapeHtml(hotel)}</li>
+                ${phone ? `<li>WhatsApp: ${escapeHtml(phone)}</li>` : ''}
+                <li>Data: ${new Date().toLocaleString('pt-BR')}</li>
+              </ul>
+              <p>Até breve! 🚀</p>
+              <p><strong>Time Chat Hotel</strong></p>
+            </div>
+            <div class="footer">
+              <p>© 2026 Chat Hotel - Concierge IA para Hotelaria</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
     // Enviar email para o administrador
-    const adminMailOptions = {
-      from: process.env.EMAIL_USER || 'seu-email@gmail.com',
-      to: 'giu.debona@gmail.com',
-      subject: `Novo Lead - Chat Hotel: ${hotel}`,
-      html: `
-        <h2>Nova Submissão do Formulário</h2>
-        <p><strong>Nome:</strong> ${name}</p>
-        <p><strong>Hotel:</strong> ${hotel}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>WhatsApp:</strong> ${phone}</p>
-        <p><strong>Mensagem:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-        <hr>
-        <p style="font-size: 12px; color: #999;">Enviado em ${new Date().toLocaleString('pt-BR')}</p>
-      `
-    };
+    await transporter.sendMail({
+      from: SENDER_EMAIL,
+      to: RECIPIENT_EMAIL,
+      replyTo: email,
+      subject: `Chat Hotel - Proposta de ${escapeHtml(name)}`,
+      html: adminHtmlContent,
+      text: `Nova Proposta\n\nNome: ${name}\nEmail: ${email}\nHotel: ${hotel}\n${phone ? `WhatsApp: ${phone}\n` : ''}Mensagem: ${message}`
+    });
 
     // Enviar confirmação para o cliente
-    const clientMailOptions = {
-      from: process.env.EMAIL_USER || 'seu-email@gmail.com',
+    await transporter.sendMail({
+      from: SENDER_EMAIL,
       to: email,
-      subject: 'Recebemos sua solicitação - Chat Hotel 🎉',
-      html: `
-        <h2>Obrigado pelo seu interesse!</h2>
-        <p>Olá ${name},</p>
-        <p>Recebemos sua solicitação de demonstração do Chat Hotel para <strong>${hotel}</strong>.</p>
-        <p>Nosso time entrará em contato em até 1 hora útil pelo WhatsApp <strong>${phone}</strong> ou por email para agendar sua demonstração.</p>
-        <hr>
-        <p style="font-size: 12px; color: #999;">Se tiver dúvidas, entre em contato: chathotel@elevare.tur.br</p>
-      `
-    };
+      subject: 'Recebemos sua mensagem! 🎯 - Chat Hotel',
+      html: clientHtmlContent,
+      text: `Olá ${name},\n\nObrigado por seu interesse no Chat Hotel!\n\nRecebemos sua proposta com sucesso.`
+    });
 
-    // Enviar ambos os emails
-    await transporter.sendMail(adminMailOptions);
-    await transporter.sendMail(clientMailOptions);
-
-    res.json({ success: true, message: 'Formulário recebido com sucesso!' });
+    res.json({
+      success: true,
+      message: 'Proposta enviada com sucesso! Você receberá uma confirmação por email.'
+    });
   } catch (error) {
     console.error('Erro ao enviar email:', error);
-    res.status(500).json({ error: 'Erro ao processar sua solicitação' });
+    res.status(500).json({
+      success: false,
+      error: 'Erro ao processar sua solicitação. Tente novamente mais tarde.',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
-  console.log(`📧 Emails serão enviados para: giu.debona@gmail.com`);
+  console.log(`
+╔════════════════════════════════════════════════════════════╗
+║                 Chat Hotel API Server                      ║
+╚════════════════════════════════════════════════════════════╝
+
+🎯 Servidor rodando em http://localhost:${PORT}
+📧 Email via SendGrid
+🔌 CORS habilitado
+
+Aguardando requisições...
+  `);
 });
