@@ -15,6 +15,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('.'));
 
+// Servir index.html na raiz
+app.get('/', (req, res) => {
+  res.sendFile(`${__dirname}/index.html`);
+});
+
 // Configuração de email via Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
